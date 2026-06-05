@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Life Journey - Seezaw Pastry Shop</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="ui">
+        🍰 Pasteles: <span id="cakes">0</span><br>
+        👶 Etapa: <span id="stage">Bebé</span>
+    </div>
+
+    <!-- Pantalla de inicio -->
+    <div id="startScreen">
+        <h1>Life Journey</h1>
+        <p>Recoge pasteles y crece mientras evitas enemigos</p>
+        <button id="startBtn">Jugar</button>
+        <button id="rulesBtn">📜 Reglas</button>
+    </div>
+
+    <!-- Panel de reglas -->
+    <div id="rulesPanel" style="display: none;">
+        <div class="rules-content">
+            <h2>Reglas del juego</h2>
+            <p><strong>Objetivo:</strong> Llega al final del nivel recolectando todos los pasteles para hacer crecer al personaje y ganar un descuento en Seezaw Pastry Shop.</p>
+            <p><strong>Etapas:</strong></p>
+            <ul>
+                <li>👶 <strong>Bebé (0-3 pasteles):</strong> Movimiento básico.</li>
+                <li>🧒 <strong>Niño (4-7 pasteles):</strong> Mayor tamaño.</li>
+                <li>🧑 <strong>Adolescente (8-12 pasteles):</strong> Puede eliminar enemigos saltando sobre ellos.</li>
+                <li>👨‍🍳 <strong>Adulto (13-17 pasteles):</strong> Doble salto y mayor velocidad.</li>
+                <li>👴 <strong>Anciano (18+ pasteles):</strong> Resiste un golpe (invencibilidad temporal).</li>
+            </ul>
+            <p><strong>Descuento:</strong> Empiezas con 50% de descuento. Cada vez que mueras, el descuento se reduce un 5% (mínimo 5%). Solo obtienes el descuento si recoges <strong>todos los pasteles</strong>. Si no, recibirás una felicitación sin código.</p>
+            <button id="closeRulesBtn">Cerrar</button>
+        </div>
+    </div>
+
+    <!-- Pantalla de victoria -->
+    <div id="winScreen" style="display: none;">
+        <h2>🎉 ¡Felicidades! 🎉</h2>
+        <p id="winMessage"></p>
+        <div id="discountBox" class="discount-box" style="display: none;">
+            <p>Código de descuento:</p>
+            <p class="discount-code" id="discountCode"></p>
+            <p id="discountText"></p>
+        </div>
+        <button id="winRestartBtn" style="display: none;">Volver a Jugar</button>
+    </div>
+
+    <!-- Pantalla de Game Over -->
+    <div id="gameOverScreen" style="display: none;">
+        <h2>💔 Un Dulce Final 💔</h2>
+        <p>Cada recuerdo es un tesoro.</p>
+        <button id="overRestartBtn">Intentar de Nuevo</button>
+    </div>
+
+    <canvas id="gameCanvas"></canvas>
+
+    <script src="script.js"></script>
+    <script src="audio.js"></script>
+
+</body>
+</html>

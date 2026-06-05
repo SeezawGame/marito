@@ -1,0 +1,220 @@
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    overflow:hidden;
+    background:#87CEEB;
+    font-family:Arial, Helvetica, sans-serif;
+}
+
+canvas{
+    display:block;
+    background:linear-gradient(#87CEEB 70%, #6fcf5b 70%);
+}
+
+#ui{
+    position:absolute;
+    top:15px;
+    left:15px;
+    background:rgba(0,0,0,0.5);
+    color:white;
+    padding:10px 15px;
+    border-radius:10px;
+    font-size:18px;
+    z-index:10;
+}
+
+/* ========================= */
+/* PANTALLA DE INICIO */
+/* ========================= */
+#startScreen{
+    position:absolute;
+    width:100%;
+    height:100%;
+    background-image: url('img/inicio.png');
+    background-size: cover;
+    background-position: center;
+    background-color: #2A1E1E;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    flex-direction:column;
+    color:white;
+    z-index:20;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
+}
+
+#startScreen h1{
+    font-size:60px;
+    margin-bottom:20px;
+}
+
+#startScreen p{
+    margin-bottom:20px;
+    font-size:20px;
+}
+
+#startBtn, #rulesBtn{
+    padding:15px 40px;
+    font-size:20px;
+    border:none;
+    border-radius:10px;
+    cursor:pointer;
+    background:#ffb347;
+    transition:0.2s;
+    margin:5px;
+}
+
+#rulesBtn{
+    background:#ffb347;
+    font-size:18px;
+}
+
+#startBtn:hover, #rulesBtn:hover{
+    transform:scale(1.05);
+}
+
+/* ========================= */
+/* PANEL DE REGLAS */
+/* ========================= */
+#rulesPanel{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.8);
+    z-index: 40;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.rules-content{
+    background: #FFF8E7;
+    color: #1B2A4A;
+    padding: 30px;
+    border-radius: 15px;
+    max-width: 600px;
+    width: 90%;
+    text-align: left;
+    font-size: 16px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.5);
+}
+
+.rules-content h2{
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.rules-content ul{
+    margin-left: 20px;
+    margin-bottom: 15px;
+}
+
+#closeRulesBtn{
+    display: block;
+    margin: 20px auto 0;
+    padding: 12px 30px;
+    font-size: 18px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    background: #ffb347;
+    color: #1B2A4A;
+    font-weight: bold;
+}
+
+/* ========================= */
+/* PANTALLA DE VICTORIA */
+/* ========================= */
+#winScreen{
+    position:absolute;
+    width:100%;
+    height:100%;
+    background-image: url('img/victoria.png');
+    background-size: cover;
+    background-position: center;
+    background-color: #2A1E1E;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    flex-direction:column;
+    color:white;
+    z-index:30;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
+}
+
+#winScreen h2{
+    font-size:50px;
+    margin-bottom:15px;
+}
+
+#winScreen p{
+    font-size:22px;
+    margin-bottom:10px;
+}
+
+.discount-box{
+    background: rgba(0, 0, 0, 0.6);
+    padding: 15px 25px;
+    border-radius: 10px;
+    margin: 15px 0;
+    text-align: center;
+}
+
+.discount-code{
+    font-size: 2em;
+    font-weight: bold;
+    color: #FFD700;
+    letter-spacing: 3px;
+}
+
+/* ========================= */
+/* PANTALLA DE GAME OVER */
+/* ========================= */
+#gameOverScreen{
+    position:absolute;
+    width:100%;
+    height:100%;
+    background-image: url('img/gameover.png');
+    background-size: cover;
+    background-position: center;
+    background-color: #2A1E1E;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    flex-direction:column;
+    color:white;
+    z-index:30;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
+}
+
+#gameOverScreen h2{
+    font-size:50px;
+    margin-bottom:15px;
+}
+
+#gameOverScreen p{
+    font-size:22px;
+    margin-bottom:10px;
+}
+
+/* ========================= */
+/* BOTONES DE REINICIO */
+/* ========================= */
+#winRestartBtn, #overRestartBtn{
+    padding:15px 40px;
+    font-size:20px;
+    border:none;
+    border-radius:10px;
+    cursor:pointer;
+    background:#ffb347;
+    transition:0.2s;
+    margin-top:20px;
+}
+
+#winRestartBtn:hover, #overRestartBtn:hover{
+    transform:scale(1.05);
+}
