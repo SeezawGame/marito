@@ -3,7 +3,9 @@ const ctx = canvas.getContext("2d");
 
 function resizeCanvas() {
     canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    // Altura mínima para que el suelo SIEMPRE sea visible en móviles
+    const vh = window.innerHeight;
+    canvas.height = Math.max(700, vh);
 }
 
 resizeCanvas();
@@ -37,7 +39,6 @@ let gameOver = false;
 let gameWon = false;
 let gameLoopId = null;
 
-// 🔥 Descuento persistente en sessionStorage
 let discount = parseInt(sessionStorage.getItem('seezawDiscount')) || 50;
 let allCakesCollected = false;
 const TOTAL_CAKES = 24;
@@ -363,13 +364,13 @@ function safePlay(soundKey) {
     if (typeof AudioEngine !== 'undefined') { try { AudioEngine.play(soundKey); } catch(e) {} }
 }
 
-// 🔥 Ahora descuento se lee de sessionStorage y nunca se resetea a 50 hasta que se cierre la sesión
 function resetGame() {
     gameOver = false; gameWon = false;
-    // Mantenemos el descuento actual desde sessionStorage (ya se actualiza en cada muerte)
     discount = parseInt(sessionStorage.getItem('seezawDiscount')) || 50;
     allCakesCollected = false;
-    player.x = 100; player.y = 300; player.velocityX = 0; player.velocityY = 0;
+    player.x = 100;
+    player.y = canvas.height - 400; // se ajusta al alto real del móvil
+    player.velocityX = 0; player.velocityY = 0;
     player.width = 50; player.height = 50; player.speed = 5; player.jumpPower = -14;
     player.cakes = 0; player.stage = 0; player.grounded = false;
     player.onMovingPlatform = false; player.movingPlatformVelocity = 0;
@@ -495,7 +496,6 @@ function updateStage() {
     stageText.textContent = stages[player.stage];
 }
 
-// 🔥 Actualiza descuento y guarda en sessionStorage
 function decreaseDiscount() {
     discount = Math.max(5, discount - 5);
     sessionStorage.setItem('seezawDiscount', discount);
@@ -533,7 +533,7 @@ function checkEnemyCollision() {
             }
             if (invincible) continue;
 
-            decreaseDiscount(); // 🔥 Descuento se reduce y guarda
+            decreaseDiscount();
             gameOver = true;
             showMessage("💀 GAME OVER 💀", true);
             document.getElementById('gameOverScreen').style.display = 'flex';
@@ -546,7 +546,7 @@ function checkEnemyCollision() {
 }
 
 // =========================
-// CÁMARA
+// CÁMARA (ahora con ajuste vertical)
 // =========================
 let cameraX = 0;
 function updateCamera() {
@@ -562,7 +562,7 @@ function isVisible(objX, objY, objW, objH) {
 }
 
 // =========================
-// DIBUJO DEL MUNDO
+// DIBUJO DEL MUNDO (suelo dinámico)
 // =========================
 function drawBackground() {
     const bg = images['background'];
@@ -595,19 +595,20 @@ function drawBackground() {
     }
 
     const ground = images['ground_tile'];
+    const groundY = canvas.height - 120; // suelo se pega al fondo
     if (ground && ground.complete) {
         const tileW = ground.width;
         const tileH = ground.height;
         const startX = Math.floor(cameraX / tileW) * tileW;
         const endX = cameraX + canvas.width + tileW;
         for (let x = startX; x < endX; x += tileW) {
-            for (let y = 600; y < canvas.height; y += tileH) {
+            for (let y = groundY; y < canvas.height; y += tileH) {
                 ctx.drawImage(ground, x, y, tileW, tileH);
             }
         }
     } else {
         ctx.fillStyle = "#D2B48C";
-        ctx.fillRect(0, 600, WORLD_WIDTH, canvas.height - 600);
+        ctx.fillRect(0, groundY, WORLD_WIDTH, canvas.height - groundY);
     }
 }
 
@@ -647,7 +648,7 @@ function drawCakes() {
 }
 
 // =========================
-// GAME LOOP (con nueva lógica de descuento)
+// GAME LOOP (con cámara vertical)
 // =========================
 function gameLoop() {
     if (gameOver || gameWon) return;
@@ -657,7 +658,9 @@ function gameLoop() {
 
     updateCamera();
     ctx.save();
-    ctx.translate(-cameraX, 0);
+    // Ajuste vertical: mueve la vista hacia arriba si el canvas es más bajo que 600px
+    const cameraY = Math.max(0, 600 - canvas.height);
+    ctx.translate(-cameraX, -cameraY);
 
     updateMovablePlatforms();
     updateEnemiesPosition();
@@ -667,7 +670,7 @@ function gameLoop() {
     checkEnemyCollision();
 
     if (player.y > 1200) {
-        decreaseDiscount(); // 🔥 descuento por caída
+        decreaseDiscount();
         gameOver = true;
         showMessage("🌊 Caíste al vacío 🌊", true);
         document.getElementById('gameOverScreen').style.display = 'flex';
@@ -700,7 +703,7 @@ function gameLoop() {
             document.getElementById('discountBox').style.display = 'block';
             document.getElementById('discountCode').textContent = 'DULCES' + discount;
             document.getElementById('discountText').textContent = discount + '% de descuento en Seezaw Pastry Shop';
-            document.getElementById('winRestartBtn').style.display = 'none'; // No se puede reiniciar
+            document.getElementById('winRestartBtn').style.display = 'none';
         } else {
             document.getElementById('winMessage').textContent = 'Has completado el viaje, pero te faltaron pasteles. ¡Sin descuento!';
             document.getElementById('discountBox').style.display = 'none';
@@ -717,12 +720,16 @@ function gameLoop() {
 }
 
 // =========================
-// CONTROLES TÁCTILES
+// CONTROLES TÁCTILES (más pequeños y compactos)
 // =========================
 function addTouchControls() {
     const jumpBtn = document.createElement("button");
-    jumpBtn.style.position = "fixed"; jumpBtn.style.bottom = "30px"; jumpBtn.style.left = "30px";
-    jumpBtn.style.width = "80px"; jumpBtn.style.height = "80px"; jumpBtn.style.border = "none";
+    jumpBtn.style.position = "fixed";
+    jumpBtn.style.bottom = "20px";
+    jumpBtn.style.left = "20px";
+    jumpBtn.style.width = "60px";
+    jumpBtn.style.height = "60px";
+    jumpBtn.style.border = "none";
     jumpBtn.style.backgroundImage = "url('img/jump_btn.png')";
     jumpBtn.style.backgroundSize = "cover";
     jumpBtn.style.backgroundColor = "transparent";
@@ -734,11 +741,17 @@ function addTouchControls() {
     document.body.appendChild(jumpBtn);
 
     const moveContainer = document.createElement("div");
-    moveContainer.style.position = "fixed"; moveContainer.style.bottom = "30px"; moveContainer.style.right = "30px";
-    moveContainer.style.display = "flex"; moveContainer.style.gap = "15px"; moveContainer.style.zIndex = "1000";
+    moveContainer.style.position = "fixed";
+    moveContainer.style.bottom = "20px";
+    moveContainer.style.right = "20px";
+    moveContainer.style.display = "flex";
+    moveContainer.style.gap = "12px";
+    moveContainer.style.zIndex = "1000";
 
     const leftBtn = document.createElement("button");
-    leftBtn.style.width = "70px"; leftBtn.style.height = "70px"; leftBtn.style.border = "none";
+    leftBtn.style.width = "55px";
+    leftBtn.style.height = "55px";
+    leftBtn.style.border = "none";
     leftBtn.style.backgroundImage = "url('img/arrow_left.png')";
     leftBtn.style.backgroundSize = "cover";
     leftBtn.style.backgroundColor = "transparent";
@@ -748,7 +761,9 @@ function addTouchControls() {
     leftBtn.addEventListener("mouseup", (e) => { e.preventDefault(); keys["ArrowLeft"] = false; });
 
     const rightBtn = document.createElement("button");
-    rightBtn.style.width = "70px"; rightBtn.style.height = "70px"; rightBtn.style.border = "none";
+    rightBtn.style.width = "55px";
+    rightBtn.style.height = "55px";
+    rightBtn.style.border = "none";
     rightBtn.style.backgroundImage = "url('img/arrow_right.png')";
     rightBtn.style.backgroundSize = "cover";
     rightBtn.style.backgroundColor = "transparent";
@@ -757,7 +772,8 @@ function addTouchControls() {
     rightBtn.addEventListener("mousedown", (e) => { e.preventDefault(); keys["ArrowRight"] = true; });
     rightBtn.addEventListener("mouseup", (e) => { e.preventDefault(); keys["ArrowRight"] = false; });
 
-    moveContainer.appendChild(leftBtn); moveContainer.appendChild(rightBtn);
+    moveContainer.appendChild(leftBtn);
+    moveContainer.appendChild(rightBtn);
     document.body.appendChild(moveContainer);
 }
 
@@ -788,8 +804,6 @@ document.getElementById('overRestartBtn').addEventListener('click', () => {
     document.getElementById('gameOverScreen').style.display = 'none';
     manualReset();
 });
-
-// 🔥 Ya NO creamos el botón "Reiniciar"
 
 // Iniciar todo
 loadAllImages();
