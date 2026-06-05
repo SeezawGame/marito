@@ -1,12 +1,21 @@
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
-
-window.addEventListener("resize", () => {
+function resizeCanvas() {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
+    // Forzar redibujado si es necesario
+    if (gameLoopId) {
+        cancelAnimationFrame(gameLoopId);
+        gameLoop();
+    }
+}
+
+resizeCanvas();
+
+window.addEventListener("resize", resizeCanvas);
+window.addEventListener("orientationchange", () => {
+    setTimeout(resizeCanvas, 100); // Pequeño retraso para que el navegador se adapte
 });
 
 // UI
