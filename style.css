@@ -4,76 +4,182 @@
     box-sizing:border-box;
 }
 
+html,
 body{
+    width:100%;
+    height:100%;
     overflow:hidden;
+    position:fixed;
+}
+
+body{
     background:#87CEEB;
     font-family:Arial, Helvetica, sans-serif;
+
+    /* Evitar comportamientos raros en móvil */
+    overscroll-behavior:none;
+    -webkit-user-select:none;
+    user-select:none;
+    touch-action:none;
 }
 
+/* ========================= */
+/* CANVAS */
+/* ========================= */
 canvas{
     display:block;
+    width:100vw;
+    height:100vh;
+
     background:linear-gradient(#87CEEB 70%, #6fcf5b 70%);
+
+    touch-action:none;
+
+    /* Evita quedar encima de pantallas */
+    position:relative;
+    z-index:1;
 }
 
+/* ========================= */
+/* UI DEL JUEGO */
+/* ========================= */
 #ui{
-    position:absolute;
+    position:fixed;
     top:15px;
     left:15px;
+
     background:rgba(0,0,0,0.5);
     color:white;
+
     padding:10px 15px;
     border-radius:10px;
+
     font-size:18px;
-    z-index:10;
+
+    z-index:1000;
+}
+
+/* ========================= */
+/* PANTALLAS PRINCIPALES */
+/* ========================= */
+#startScreen,
+#winScreen,
+#gameOverScreen,
+#rulesPanel{
+    position:fixed !important;
+    inset:0;
+
+    width:100%;
+    height:100%;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    flex-direction:column;
+
+    color:white;
+
+    z-index:9999 !important;
+
+    text-shadow:2px 2px 4px rgba(0,0,0,0.7);
 }
 
 /* ========================= */
 /* PANTALLA DE INICIO */
 /* ========================= */
 #startScreen{
-    position:absolute;
-    width:100%;
-    height:100%;
-    background-image: url('img/inicio.png');
-    background-size: cover;
-    background-position: center;
-    background-color: #2A1E1E;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    flex-direction:column;
-    color:white;
-    z-index:20;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
+    background-image:url('img/inicio.png');
+    background-size:cover;
+    background-position:center;
+    background-color:#2A1E1E;
 }
 
+/* ========================= */
+/* PANTALLA DE VICTORIA */
+/* ========================= */
+#winScreen{
+    background-image:url('img/victoria.png');
+    background-size:cover;
+    background-position:center;
+    background-color:#2A1E1E;
+}
+
+/* ========================= */
+/* PANTALLA GAME OVER */
+/* ========================= */
+#gameOverScreen{
+    background-image:url('img/gameover.png');
+    background-size:cover;
+    background-position:center;
+    background-color:#2A1E1E;
+}
+
+/* ========================= */
+/* TITULOS */
+/* ========================= */
 #startScreen h1{
     font-size:60px;
     margin-bottom:20px;
 }
 
+#winScreen h2,
+#gameOverScreen h2{
+    font-size:50px;
+    margin-bottom:15px;
+}
+
+/* ========================= */
+/* TEXTOS */
+/* ========================= */
 #startScreen p{
     margin-bottom:20px;
     font-size:20px;
 }
 
-#startBtn, #rulesBtn{
+#winScreen p,
+#gameOverScreen p{
+    font-size:22px;
+    margin-bottom:10px;
+}
+
+/* ========================= */
+/* BOTONES */
+/* ========================= */
+#startBtn,
+#rulesBtn,
+#winRestartBtn,
+#overRestartBtn,
+#closeRulesBtn{
     padding:15px 40px;
+
     font-size:20px;
+
     border:none;
     border-radius:10px;
+
     cursor:pointer;
+
     background:#ffb347;
+    color:#1B2A4A;
+
     transition:0.2s;
-    margin:5px;
+
+    margin-top:20px;
+
+    font-weight:bold;
+
+    touch-action:manipulation;
 }
 
 #rulesBtn{
-    background:#ffb347;
     font-size:18px;
 }
 
-#startBtn:hover, #rulesBtn:hover{
+#startBtn:hover,
+#rulesBtn:hover,
+#winRestartBtn:hover,
+#overRestartBtn:hover,
+#closeRulesBtn:hover{
     transform:scale(1.05);
 }
 
@@ -81,207 +187,144 @@ canvas{
 /* PANEL DE REGLAS */
 /* ========================= */
 #rulesPanel{
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.8);
-    z-index: 40;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    background:rgba(0,0,0,0.8);
 }
 
 .rules-content{
-    background: #FFF8E7;
-    color: #1B2A4A;
-    padding: 30px;
-    border-radius: 15px;
-    max-width: 600px;
-    width: 90%;
-    text-align: left;
-    font-size: 16px;
-    box-shadow: 0 0 20px rgba(0,0,0,0.5);
+    background:#FFF8E7;
+    color:#1B2A4A;
+
+    padding:30px;
+
+    border-radius:15px;
+
+    max-width:600px;
+    width:90%;
+
+    text-align:left;
+    font-size:16px;
+
+    box-shadow:0 0 20px rgba(0,0,0,0.5);
 }
 
 .rules-content h2{
-    text-align: center;
-    margin-bottom: 15px;
+    text-align:center;
+    margin-bottom:15px;
 }
 
 .rules-content ul{
-    margin-left: 20px;
-    margin-bottom: 15px;
-}
-
-#closeRulesBtn{
-    display: block;
-    margin: 20px auto 0;
-    padding: 12px 30px;
-    font-size: 18px;
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    background: #ffb347;
-    color: #1B2A4A;
-    font-weight: bold;
-}
-
-/* ========================= */
-/* PANTALLA DE VICTORIA */
-/* ========================= */
-#winScreen{
-    position:absolute;
-    width:100%;
-    height:100%;
-    background-image: url('img/victoria.png');
-    background-size: cover;
-    background-position: center;
-    background-color: #2A1E1E;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    flex-direction:column;
-    color:white;
-    z-index:30;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
-}
-
-#winScreen h2{
-    font-size:50px;
+    margin-left:20px;
     margin-bottom:15px;
 }
 
-#winScreen p{
-    font-size:22px;
-    margin-bottom:10px;
-}
-
+/* ========================= */
+/* CAJA DE DESCUENTO */
+/* ========================= */
 .discount-box{
-    background: rgba(0, 0, 0, 0.6);
-    padding: 15px 25px;
-    border-radius: 10px;
-    margin: 15px 0;
-    text-align: center;
+    background:rgba(0,0,0,0.6);
+
+    padding:15px 25px;
+
+    border-radius:10px;
+
+    margin:15px 0;
+
+    text-align:center;
 }
 
 .discount-code{
-    font-size: 2em;
-    font-weight: bold;
-    color: #FFD700;
-    letter-spacing: 3px;
+    font-size:2em;
+    font-weight:bold;
+    color:#FFD700;
+    letter-spacing:3px;
 }
 
-/* ========================= */
-/* PANTALLA DE GAME OVER */
-/* ========================= */
-#gameOverScreen{
-    position:absolute;
-    width:100%;
-    height:100%;
-    background-image: url('img/gameover.png');
-    background-size: cover;
-    background-position: center;
-    background-color: #2A1E1E;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    flex-direction:column;
-    color:white;
-    z-index:30;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
-}
-
-#gameOverScreen h2{
-    font-size:50px;
-    margin-bottom:15px;
-}
-
-#gameOverScreen p{
-    font-size:22px;
-    margin-bottom:10px;
-}
-
-/* ========================= */
-/* BOTONES DE REINICIO */
-/* ========================= */
-#winRestartBtn, #overRestartBtn{
-    padding:15px 40px;
-    font-size:20px;
-    border:none;
-    border-radius:10px;
-    cursor:pointer;
-    background:#ffb347;
-    transition:0.2s;
-    margin-top:20px;
-}
-
-#winRestartBtn:hover, #overRestartBtn:hover{
-    transform:scale(1.05);
-}
 /* ========================= */
 /* AJUSTES PARA MÓVIL */
 /* ========================= */
-@media (max-width: 768px) {
-    #ui {
-        top: 10px;
-        left: 10px;
-        padding: 8px 12px;
-        font-size: 14px;
+@media (max-width:768px){
+
+    #ui{
+        top:10px;
+        left:10px;
+
+        padding:8px 12px;
+
+        font-size:14px;
     }
 
-    #startScreen h1 {
-        font-size: 36px;
+    #startScreen h1{
+        font-size:36px;
+        text-align:center;
+        padding:0 15px;
     }
 
-    #startScreen p {
-        font-size: 16px;
+    #startScreen p{
+        font-size:16px;
+        text-align:center;
+        padding:0 20px;
     }
 
-    #startBtn, #rulesBtn {
-        padding: 12px 30px;
-        font-size: 18px;
+    #startBtn,
+    #rulesBtn,
+    #winRestartBtn,
+    #overRestartBtn,
+    #closeRulesBtn{
+        padding:12px 28px;
+        font-size:16px;
     }
 
-    .rules-content {
-        padding: 20px;
-        max-width: 90%;
-        font-size: 14px;
+    .rules-content{
+        padding:20px;
+        max-width:90%;
+        font-size:14px;
     }
 
-    #winScreen h2, #gameOverScreen h2 {
-        font-size: 32px;
+    #winScreen h2,
+    #gameOverScreen h2{
+        font-size:32px;
+        text-align:center;
+        padding:0 15px;
     }
 
-    #winScreen p, #gameOverScreen p {
-        font-size: 16px;
+    #winScreen p,
+    #gameOverScreen p{
+        font-size:16px;
+        text-align:center;
+        padding:0 20px;
     }
 
-    .discount-code {
-        font-size: 1.5em;
+    .discount-code{
+        font-size:1.5em;
+        letter-spacing:2px;
+    }
+
+    .discount-box{
+        width:90%;
     }
 }
-
-/* Evitar zoom en móviles al tocar botones */
-button, canvas {
-    touch-action: manipulation;
+/* Correcciones para pantallas sobre canvas */
+#winScreen,
+#gameOverScreen,
+#startScreen,
+#rulesPanel {
+    position: fixed !important;
+    inset: 0;
+    z-index: 9999 !important;
 }
 
-/* Asegurar que el canvas ocupe toda la pantalla */
-html, body {
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    position: fixed;
-}
-/* Evitar zoom y gestos extraños en móvil */
 canvas {
-    width: 100vw;
-    height: 100vh;
-    touch-action: none;
+    z-index: 1;
+}
+/* Logo de Seezaw */
+#logo {
+    max-width: 250px;
+    height: auto;
+    margin-bottom: 20px;
+    filter: drop-shadow(0 0 10px rgba(255,255,255,0.5));
 }
 
-body {
-    overscroll-behavior: none;
-    -webkit-user-select: none;
-    user-select: none;
+/* Ajuste opcional para que el título no sea tan grande si hay logo */
+#startScreen h1 {
+    font-size: 48px; /* antes era 60px */
 }

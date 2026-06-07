@@ -3,7 +3,6 @@ const ctx = canvas.getContext("2d");
 
 function resizeCanvas() {
     canvas.width = window.innerWidth;
-    // Altura mínima para que el suelo SIEMPRE sea visible en móviles
     const vh = window.innerHeight;
     canvas.height = Math.max(700, vh);
 }
@@ -15,7 +14,7 @@ window.addEventListener("orientationchange", () => {
     setTimeout(resizeCanvas, 100);
 });
 
-// UI
+// UI (solo si los elementos existen)
 const cakesText = document.getElementById("cakes");
 const stageText = document.getElementById("stage");
 
@@ -52,7 +51,7 @@ let invincibleTimer = null;
 let jumpPressed = false;
 
 const player = {
-    x: 100, y: 300, width: 50, height: 50,
+    x: 100, y: 450, width: 50, height: 50,
     velocityX: 0, velocityY: 0, speed: 5, jumpPower: -14, gravity: 0.7,
     grounded: false, cakes: 0, stage: 0,
     onMovingPlatform: false, movingPlatformVelocity: 0,
@@ -65,9 +64,7 @@ const player = {
 const stages = ["Bebé", "Niño", "Adolescente", "Adulto", "Anciano"];
 const stageKeys = ["baby", "child", "teen", "adult", "elder"];
 
-// =========================
 // IMÁGENES
-// =========================
 const images = {};
 const imageSizes = {};
 
@@ -97,9 +94,7 @@ function loadAllImages() {
     enemyColors.forEach(color => loadImage(`enemy_${color}`, `img/enemy_${color}.png`));
 }
 
-// =========================
 // ANIMACIONES
-// =========================
 const ANIM_FRAMES = { idle: 4, walk: 6, jump: 5 };
 
 function drawPlayerSprite() {
@@ -167,9 +162,7 @@ function drawEnemySprite(enemy) {
     }
 }
 
-// =========================
-// PLATAFORMAS, PASTELES, ENEMIGOS (completos)
-// =========================
+// PLATAFORMAS, PASTELES, ENEMIGOS
 const platforms = [
     {id:"p1", x:0, y:500, width:400, height:100},
     {id:"p2", x:300, y:420, width:150, height:40},
@@ -265,9 +258,7 @@ const initialEnemies = [
 ];
 let enemies = JSON.parse(JSON.stringify(initialEnemies));
 
-// =========================
 // PLATAFORMAS MÓVILES
-// =========================
 let movablePlatforms = [];
 let platformMap = new Map();
 
@@ -346,9 +337,7 @@ function updateEnemiesPosition() {
     }
 }
 
-// =========================
 // CONTROLES Y MENSAJES
-// =========================
 const keys = {};
 window.addEventListener("keydown", (e) => keys[e.key] = true);
 window.addEventListener("keyup", (e) => keys[e.key] = false);
@@ -369,7 +358,7 @@ function resetGame() {
     discount = parseInt(sessionStorage.getItem('seezawDiscount')) || 50;
     allCakesCollected = false;
     player.x = 100;
-    player.y = canvas.height - 400; // se ajusta al alto real del móvil
+    player.y = 450;
     player.velocityX = 0; player.velocityY = 0;
     player.width = 50; player.height = 50; player.speed = 5; player.jumpPower = -14;
     player.cakes = 0; player.stage = 0; player.grounded = false;
@@ -380,7 +369,9 @@ function resetGame() {
     if (invincibleTimer) clearTimeout(invincibleTimer);
     cakes = JSON.parse(JSON.stringify(initialCakes));
     enemies = JSON.parse(JSON.stringify(initialEnemies));
-    cakesText.textContent = "0"; stageText.textContent = stages[0]; gameMessage.style.display = "none";
+    if (cakesText) cakesText.textContent = "0";
+    if (stageText) stageText.textContent = stages[0];
+    gameMessage.style.display = "none";
     initMovablePlatforms(); initEnemiesPosition();
     if (typeof AudioEngine !== 'undefined') { try { AudioEngine.stopBGM(); AudioEngine.playBGM(); } catch(e) {} }
 }
@@ -464,7 +455,8 @@ function collectCakes() {
     for (let cake of cakes) {
         if (!cake.collected && player.x < cake.x + cake.width && player.x + player.width > cake.x &&
             player.y < cake.y + cake.height && player.y + player.height > cake.y) {
-            cake.collected = true; player.cakes++; cakesText.textContent = player.cakes;
+            cake.collected = true; player.cakes++;
+            if (cakesText) cakesText.textContent = player.cakes;
             showMessage(`+1 Pastel (${player.cakes})`); safePlay('collectCake'); updateStage();
         }
     }
@@ -493,7 +485,7 @@ function updateStage() {
         safePlay('evolve');
     }
     if (player.height > oldH) player.y = oldY - (player.height - oldH);
-    stageText.textContent = stages[player.stage];
+    if (stageText) stageText.textContent = stages[player.stage];
 }
 
 function decreaseDiscount() {
@@ -536,7 +528,8 @@ function checkEnemyCollision() {
             decreaseDiscount();
             gameOver = true;
             showMessage("💀 GAME OVER 💀", true);
-            document.getElementById('gameOverScreen').style.display = 'flex';
+            const gameOverScreen = document.getElementById('gameOverScreen');
+            if (gameOverScreen) gameOverScreen.style.display = 'flex';
             safePlay('gameOver');
             if (typeof AudioEngine !== 'undefined') { try { AudioEngine.stopBGM(); } catch(e) {} }
             if (gameLoopId) cancelAnimationFrame(gameLoopId);
@@ -545,25 +538,19 @@ function checkEnemyCollision() {
     }
 }
 
-// =========================
-// CÁMARA (ahora con ajuste vertical)
-// =========================
+// CÁMARA
 let cameraX = 0;
 function updateCamera() {
     cameraX = Math.max(0, Math.min(player.x + player.width/2 - canvas.width/2, WORLD_WIDTH - canvas.width));
 }
 
-// =========================
 // FUNCIÓN DE VISIBILIDAD
-// =========================
 function isVisible(objX, objY, objW, objH) {
     return (objX + objW > cameraX && objX < cameraX + canvas.width &&
             objY + objH > 0 && objY < canvas.height);
 }
 
-// =========================
-// DIBUJO DEL MUNDO (suelo dinámico)
-// =========================
+// DIBUJO DEL MUNDO
 function drawBackground() {
     const bg = images['background'];
     if (bg && bg.complete) {
@@ -595,7 +582,7 @@ function drawBackground() {
     }
 
     const ground = images['ground_tile'];
-    const groundY = canvas.height - 120; // suelo se pega al fondo
+    const groundY = canvas.height - 120;
     if (ground && ground.complete) {
         const tileW = ground.width;
         const tileH = ground.height;
@@ -647,9 +634,7 @@ function drawCakes() {
     }
 }
 
-// =========================
-// GAME LOOP (con cámara vertical)
-// =========================
+// GAME LOOP
 function gameLoop() {
     if (gameOver || gameWon) return;
 
@@ -658,7 +643,6 @@ function gameLoop() {
 
     updateCamera();
     ctx.save();
-    // Ajuste vertical: mueve la vista hacia arriba si el canvas es más bajo que 600px
     const cameraY = Math.max(0, 600 - canvas.height);
     ctx.translate(-cameraX, -cameraY);
 
@@ -673,7 +657,8 @@ function gameLoop() {
         decreaseDiscount();
         gameOver = true;
         showMessage("🌊 Caíste al vacío 🌊", true);
-        document.getElementById('gameOverScreen').style.display = 'flex';
+        const gameOverScreen = document.getElementById('gameOverScreen');
+        if (gameOverScreen) gameOverScreen.style.display = 'flex';
         safePlay('gameOver');
         if (typeof AudioEngine !== 'undefined') { try { AudioEngine.stopBGM(); } catch(e) {} }
         ctx.restore();
@@ -692,120 +677,158 @@ function gameLoop() {
     }
     drawPlayerSprite();
 
-    if (player.x + player.width >= WORLD_WIDTH - 200) {
+    const reachedGoal = player.x >= WORLD_WIDTH - 350;
+
+    if (reachedGoal && !gameWon) {
         gameWon = true;
-        
+        player.velocityX = 0;
+        player.velocityY = 0;
+
+        if (gameLoopId) {
+            cancelAnimationFrame(gameLoopId);
+        }
+
         const collectedCakes = cakes.filter(c => c.collected).length;
         allCakesCollected = collectedCakes === TOTAL_CAKES;
-        
-        if (allCakesCollected) {
-            document.getElementById('winMessage').textContent = '¡Conseguiste todos los pasteles!';
-            document.getElementById('discountBox').style.display = 'block';
-            document.getElementById('discountCode').textContent = 'DULCES' + discount;
-            document.getElementById('discountText').textContent = discount + '% de descuento en Seezaw Pastry Shop';
-            document.getElementById('winRestartBtn').style.display = 'none';
-        } else {
-            document.getElementById('winMessage').textContent = 'Has completado el viaje, pero te faltaron pasteles. ¡Sin descuento!';
-            document.getElementById('discountBox').style.display = 'none';
-            document.getElementById('winRestartBtn').style.display = 'none';
+
+        const winScreen = document.getElementById('winScreen');
+        if (winScreen) {
+            if (allCakesCollected) {
+                document.getElementById('winMessage').textContent = '¡Conseguiste todos los pasteles!';
+                document.getElementById('discountBox').style.display = 'block';
+                document.getElementById('discountCode').textContent = 'DULCES' + discount;
+                document.getElementById('discountText').textContent = discount + '% de descuento en Seezaw Pastry Shop';
+            } else {
+                document.getElementById('winMessage').textContent = 'Has completado el viaje, pero te faltaron pasteles. ¡Sin descuento!';
+                document.getElementById('discountBox').style.display = 'none';
+            }
+
+            winScreen.style.display = 'flex';
+            winScreen.style.visibility = 'visible';
+            winScreen.style.opacity = '1';
         }
-        
-        document.getElementById('winScreen').style.display = 'flex';
+
         showMessage("🎉 ¡FELICIDADES! 🎉");
-        if (typeof AudioEngine !== 'undefined') { try { AudioEngine.stopBGM(); } catch(e) {} }
+        safePlay('victory');
+
+        if (typeof AudioEngine !== 'undefined') {
+            try { AudioEngine.stopBGM(); } catch(e) {}
+        }
+
+        ctx.restore();
+        return;
     }
 
     ctx.restore();
     gameLoopId = requestAnimationFrame(gameLoop);
 }
 
-// =========================
-// CONTROLES TÁCTILES (más pequeños y compactos)
-// =========================
+// CONTROLES TÁCTILES (protegidos)
 function addTouchControls() {
-    const jumpBtn = document.createElement("button");
-    jumpBtn.style.position = "fixed";
-    jumpBtn.style.bottom = "20px";
-    jumpBtn.style.left = "20px";
-    jumpBtn.style.width = "60px";
-    jumpBtn.style.height = "60px";
-    jumpBtn.style.border = "none";
-    jumpBtn.style.backgroundImage = "url('img/jump_btn.png')";
-    jumpBtn.style.backgroundSize = "cover";
-    jumpBtn.style.backgroundColor = "transparent";
-    jumpBtn.style.zIndex = "1000";
-    jumpBtn.addEventListener("touchstart", (e) => { e.preventDefault(); keys["ArrowUp"] = true; keys[" "] = true; });
-    jumpBtn.addEventListener("touchend", (e) => { e.preventDefault(); keys["ArrowUp"] = false; keys[" "] = false; });
-    jumpBtn.addEventListener("mousedown", (e) => { e.preventDefault(); keys["ArrowUp"] = true; keys[" "] = true; });
-    jumpBtn.addEventListener("mouseup", (e) => { e.preventDefault(); keys["ArrowUp"] = false; keys[" "] = false; });
-    document.body.appendChild(jumpBtn);
+    try {
+        const jumpBtn = document.createElement("button");
+        jumpBtn.style.position = "fixed";
+        jumpBtn.style.bottom = "20px";
+        jumpBtn.style.left = "20px";
+        jumpBtn.style.width = "60px";
+        jumpBtn.style.height = "60px";
+        jumpBtn.style.border = "none";
+        jumpBtn.style.backgroundImage = "url('img/jump_btn.png')";
+        jumpBtn.style.backgroundSize = "cover";
+        jumpBtn.style.backgroundColor = "transparent";
+        jumpBtn.style.zIndex = "1000";
+        jumpBtn.addEventListener("touchstart", (e) => { e.preventDefault(); keys["ArrowUp"] = true; keys[" "] = true; });
+        jumpBtn.addEventListener("touchend", (e) => { e.preventDefault(); keys["ArrowUp"] = false; keys[" "] = false; });
+        jumpBtn.addEventListener("mousedown", (e) => { e.preventDefault(); keys["ArrowUp"] = true; keys[" "] = true; });
+        jumpBtn.addEventListener("mouseup", (e) => { e.preventDefault(); keys["ArrowUp"] = false; keys[" "] = false; });
+        document.body.appendChild(jumpBtn);
 
-    const moveContainer = document.createElement("div");
-    moveContainer.style.position = "fixed";
-    moveContainer.style.bottom = "20px";
-    moveContainer.style.right = "20px";
-    moveContainer.style.display = "flex";
-    moveContainer.style.gap = "12px";
-    moveContainer.style.zIndex = "1000";
+        const moveContainer = document.createElement("div");
+        moveContainer.style.position = "fixed";
+        moveContainer.style.bottom = "20px";
+        moveContainer.style.right = "20px";
+        moveContainer.style.display = "flex";
+        moveContainer.style.gap = "12px";
+        moveContainer.style.zIndex = "1000";
 
-    const leftBtn = document.createElement("button");
-    leftBtn.style.width = "55px";
-    leftBtn.style.height = "55px";
-    leftBtn.style.border = "none";
-    leftBtn.style.backgroundImage = "url('img/arrow_left.png')";
-    leftBtn.style.backgroundSize = "cover";
-    leftBtn.style.backgroundColor = "transparent";
-    leftBtn.addEventListener("touchstart", (e) => { e.preventDefault(); keys["ArrowLeft"] = true; });
-    leftBtn.addEventListener("touchend", (e) => { e.preventDefault(); keys["ArrowLeft"] = false; });
-    leftBtn.addEventListener("mousedown", (e) => { e.preventDefault(); keys["ArrowLeft"] = true; });
-    leftBtn.addEventListener("mouseup", (e) => { e.preventDefault(); keys["ArrowLeft"] = false; });
+        const leftBtn = document.createElement("button");
+        leftBtn.style.width = "55px";
+        leftBtn.style.height = "55px";
+        leftBtn.style.border = "none";
+        leftBtn.style.backgroundImage = "url('img/arrow_left.png')";
+        leftBtn.style.backgroundSize = "cover";
+        leftBtn.style.backgroundColor = "transparent";
+        leftBtn.addEventListener("touchstart", (e) => { e.preventDefault(); keys["ArrowLeft"] = true; });
+        leftBtn.addEventListener("touchend", (e) => { e.preventDefault(); keys["ArrowLeft"] = false; });
+        leftBtn.addEventListener("mousedown", (e) => { e.preventDefault(); keys["ArrowLeft"] = true; });
+        leftBtn.addEventListener("mouseup", (e) => { e.preventDefault(); keys["ArrowLeft"] = false; });
 
-    const rightBtn = document.createElement("button");
-    rightBtn.style.width = "55px";
-    rightBtn.style.height = "55px";
-    rightBtn.style.border = "none";
-    rightBtn.style.backgroundImage = "url('img/arrow_right.png')";
-    rightBtn.style.backgroundSize = "cover";
-    rightBtn.style.backgroundColor = "transparent";
-    rightBtn.addEventListener("touchstart", (e) => { e.preventDefault(); keys["ArrowRight"] = true; });
-    rightBtn.addEventListener("touchend", (e) => { e.preventDefault(); keys["ArrowRight"] = false; });
-    rightBtn.addEventListener("mousedown", (e) => { e.preventDefault(); keys["ArrowRight"] = true; });
-    rightBtn.addEventListener("mouseup", (e) => { e.preventDefault(); keys["ArrowRight"] = false; });
+        const rightBtn = document.createElement("button");
+        rightBtn.style.width = "55px";
+        rightBtn.style.height = "55px";
+        rightBtn.style.border = "none";
+        rightBtn.style.backgroundImage = "url('img/arrow_right.png')";
+        rightBtn.style.backgroundSize = "cover";
+        rightBtn.style.backgroundColor = "transparent";
+        rightBtn.addEventListener("touchstart", (e) => { e.preventDefault(); keys["ArrowRight"] = true; });
+        rightBtn.addEventListener("touchend", (e) => { e.preventDefault(); keys["ArrowRight"] = false; });
+        rightBtn.addEventListener("mousedown", (e) => { e.preventDefault(); keys["ArrowRight"] = true; });
+        rightBtn.addEventListener("mouseup", (e) => { e.preventDefault(); keys["ArrowRight"] = false; });
 
-    moveContainer.appendChild(leftBtn);
-    moveContainer.appendChild(rightBtn);
-    document.body.appendChild(moveContainer);
+        moveContainer.appendChild(leftBtn);
+        moveContainer.appendChild(rightBtn);
+        document.body.appendChild(moveContainer);
+    } catch (e) {
+        console.warn("No se pudieron crear los controles táctiles", e);
+    }
 }
 
-// 🔥 Panel de reglas
-document.getElementById('rulesBtn').addEventListener('click', () => {
-    document.getElementById('rulesPanel').style.display = 'flex';
-});
+// PANEL DE REGLAS (protegido)
+const rulesBtn = document.getElementById('rulesBtn');
+if (rulesBtn) {
+    rulesBtn.addEventListener('click', () => {
+        const rulesPanel = document.getElementById('rulesPanel');
+        if (rulesPanel) rulesPanel.style.display = 'flex';
+    });
+}
 
-document.getElementById('closeRulesBtn').addEventListener('click', () => {
-    document.getElementById('rulesPanel').style.display = 'none';
-});
+const closeRulesBtn = document.getElementById('closeRulesBtn');
+if (closeRulesBtn) {
+    closeRulesBtn.addEventListener('click', () => {
+        const rulesPanel = document.getElementById('rulesPanel');
+        if (rulesPanel) rulesPanel.style.display = 'none';
+    });
+}
 
 function manualReset() {
-    document.getElementById('winScreen').style.display = 'none';
-    document.getElementById('gameOverScreen').style.display = 'none';
+    const winScreen = document.getElementById('winScreen');
+    const gameOverScreen = document.getElementById('gameOverScreen');
+    if (winScreen) winScreen.style.display = 'none';
+    if (gameOverScreen) gameOverScreen.style.display = 'none';
     if (gameLoopId) cancelAnimationFrame(gameLoopId);
     resetGame();
     gameLoop();
 }
 
-document.getElementById("startBtn").addEventListener("click", () => {
-    document.getElementById("startScreen").style.display = "none";
-    resetGame();
-    gameLoop();
-});
+const startBtn = document.getElementById("startBtn");
+if (startBtn) {
+    startBtn.addEventListener("click", () => {
+        document.getElementById("startScreen").style.display = "none";
+        resetGame();
+        gameLoop();
+    });
+}
 
-document.getElementById('overRestartBtn').addEventListener('click', () => {
-    document.getElementById('gameOverScreen').style.display = 'none';
-    manualReset();
-});
+const overRestartBtn = document.getElementById('overRestartBtn');
+if (overRestartBtn) {
+    overRestartBtn.addEventListener('click', () => {
+        const gameOverScreen = document.getElementById('gameOverScreen');
+        if (gameOverScreen) gameOverScreen.style.display = 'none';
+        manualReset();
+    });
+}
 
-// Iniciar todo
+// INICIAR TODO
 loadAllImages();
 initMovablePlatforms();
 initEnemiesPosition();
